@@ -398,6 +398,59 @@ const HabitList = (props) => (
 );
 
 const SocialList = (props) => {
+    const [friendEmail, setFriendEmail] = useState('');
+    const [inviting, setInviting] = useState(false);
+
+    const handleEmailInvite = async () => {
+        if (!friendEmail || !friendEmail.includes('@')) {
+            alert('Please enter a valid email address.');
+            return;
+        }
+        setInviting(true);
+        try {
+            const inviteLink = "https://ioair.link/euymv7";
+            const htmlBody = `<div style="font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif; background-color: #f8fafc; padding: 32px 24px; border-radius: 32px; max-width: 600px; margin: 0 auto; color: #1e293b; border: 1px solid #e2e8f0; text-align: center;">` +
+                `<div style="text-align: center; margin-bottom: 20px;"><span style="font-size: 28px; font-weight: 800; color: #10b981; letter-spacing: -1px;">Habitify Social</span></div>` +
+                `<h3 style="margin: 20px 0 8px 0; font-size: 20px; font-weight: 800; color: #0f172a;">You have been invited!</h3>` +
+                `<p style="margin: 0 0 24px 0; font-size: 14px; color: #64748b; font-weight: 500; line-height: 1.6;">` +
+                    `Your friend <strong>${props.profile.name}</strong> (${props.profile.email}) wants to track habits and compare progress with you on Habitify!` +
+                `</p>` +
+                `<div style="margin: 24px 0;"><a href="${inviteLink}" style="background-color: #10b981; color: #ffffff; padding: 16px 32px; border-radius: 16px; font-weight: bold; text-decoration: none; display: inline-block; font-size: 14px;">Join Habitify Now 🚀</a></div>` +
+                `<div style="text-align: center; margin-top: 32px; font-size: 10px; color: #94a3b8; font-weight: 600;">` +
+                    `Sent securely via Habitify App` +
+                `</div>` +
+            `</div>`;
+
+            const response = await fetch('/api/send-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    toEmail: friendEmail,
+                    htmlBody: htmlBody
+                })
+            });
+
+            const result = await response.json();
+            if (response.ok && result.success) {
+                alert("Invitation email sent successfully!");
+                setFriendEmail('');
+            } else {
+                alert("Failed to send invite: " + (result.error || "Unknown error"));
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error sending invite: " + err.message);
+        }
+        setInviting(false);
+    };
+
+    const handleWhatsAppShare = () => {
+        const inviteLink = "https://ioair.link/euymv7";
+        const message = `Hey! Join me on Habitify to track habits together and compete on the leaderboard! ${inviteLink}`;
+        const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
+    };
+
     var myPerformance = props.habits.length > 0 ? props.habits.reduce(function(acc, h) { return acc + calculatePerformance(h, props.logs).percent; }, 0) / props.habits.length : 0;
     
     var leaderboard = [
@@ -465,13 +518,41 @@ const SocialList = (props) => {
                 </div>
             </div>
 
-            <div className="bg-emerald-600 p-6 rounded-[2.5rem] text-white space-y-4 shadow-xl shadow-emerald-100">
-                <h3 className="font-black text-lg text-center">Invite your circle</h3>
-                <button onClick={function() {
-                    var link = "https://ioair.link/euymv7";
-                    window.location.href = "mailto:?subject=Join Habitify&body=" + encodeURIComponent("Join me on Habitify! " + link);
-                }} className="bg-white text-emerald-600 w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">
-                    Share App Link 🚀
+            <div className="bg-emerald-600 p-8 rounded-[2.5rem] text-white space-y-6 shadow-xl shadow-emerald-100/50">
+                <div className="text-center">
+                    <h3 className="font-black text-xl tracking-tight">Invite your circle 🚀</h3>
+                    <p className="text-[10px] text-emerald-200 font-bold uppercase tracking-widest mt-1">Get friends on Habitify</p>
+                </div>
+                
+                <div className="space-y-3">
+                    <input 
+                        type="email" 
+                        placeholder="Friend's Email Address" 
+                        value={friendEmail} 
+                        onChange={(e) => setFriendEmail(e.target.value)} 
+                        className="w-full p-4 bg-emerald-700/50 border border-emerald-500/30 rounded-2xl outline-none font-bold text-white placeholder-emerald-300 text-center text-sm"
+                    />
+                    
+                    <button 
+                        disabled={inviting}
+                        onClick={handleEmailInvite} 
+                        className="bg-white text-emerald-600 w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all shadow-md"
+                    >
+                        {inviting ? 'Sending Invite...' : 'Send Premium Email Invite ✉️'}
+                    </button>
+                </div>
+
+                <div className="relative flex py-2 items-center">
+                    <div className="flex-grow border-t border-emerald-500/40"></div>
+                    <span className="flex-shrink mx-4 text-[10px] text-emerald-300 font-bold uppercase tracking-wider">or</span>
+                    <div className="flex-grow border-t border-emerald-500/40"></div>
+                </div>
+
+                <button 
+                    onClick={handleWhatsAppShare} 
+                    className="bg-emerald-900/40 border border-emerald-500/30 hover:bg-emerald-900/60 text-white w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2"
+                >
+                    Share on WhatsApp 💬
                 </button>
             </div>
         {props.friends.map(function(friend) {
