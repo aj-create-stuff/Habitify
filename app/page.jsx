@@ -220,38 +220,40 @@ const Page = () => {
 
     return (
         <div className="min-h-screen pb-32">
-            <header className="glass-header sticky top-0 z-30 p-6 flex justify-between items-end border-b border-slate-100/50">
-                <div className="flex items-center gap-4">
-                    <button onClick={function() { setShowProfile(true); }} className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-slate-100 active:scale-90 transition-all relative overflow-hidden">
-                         <div className="absolute inset-0 bg-emerald-500/10"></div>
-                         {profile.avatar}
-                    </button>
-                    <div>
-                        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tighter logo-gradient flex items-center gap-2">
-                            <img src="/logo.png" className="w-10 h-10 object-contain" alt="logo" onError={function(e){e.target.style.display='none';}} />
-                            Habitify
-                        </h1>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                            {view === 'home' ? profile.name : 'Community'}
-                        </p>
+            <header className="glass-header sticky top-0 z-30 border-b border-slate-100/50">
+                <div className="max-w-2xl mx-auto p-6 flex justify-between items-end w-full">
+                    <div className="flex items-center gap-4">
+                        <button onClick={function() { setShowProfile(true); }} className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-slate-100 active:scale-90 transition-all relative overflow-hidden">
+                             <div className="absolute inset-0 bg-emerald-500/10"></div>
+                             {profile.avatar}
+                        </button>
+                        <div>
+                            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tighter logo-gradient flex items-center gap-2">
+                                <img src="/logo.png" className="w-10 h-10 object-contain" alt="logo" onError={function(e){e.target.style.display='none';}} />
+                                Habitify
+                            </h1>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                {view === 'home' ? profile.name : 'Community'}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                    {installPrompt && (
-                        <button onClick={triggerInstall} className="bg-emerald-100 text-emerald-700 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-wider active:scale-90 transition-all">
-                            📥 Install App
-                        </button>
-                    )}
-                    {view === 'home' ? (
-                        <button onClick={function() { setShowAdd(true); }} className="bg-emerald-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-100 active:scale-90 transition-all">
-                            <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="3.5"><path d="M14 6v16M6 14h16"/></svg>
-                        </button>
-                    ) : (
-                        <button onClick={function() { setShowSearch(true); }} className="bg-slate-900 text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl shadow-slate-200 active:scale-90 transition-all">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                        </button>
-                    )}
+                    
+                    <div className="flex items-center gap-2">
+                        {installPrompt && (
+                            <button onClick={triggerInstall} className="bg-emerald-100 text-emerald-700 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-wider active:scale-90 transition-all">
+                                📥 Install App
+                            </button>
+                        )}
+                        {view === 'home' ? (
+                            <button onClick={function() { setShowAdd(true); }} className="bg-emerald-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-100 active:scale-90 transition-all">
+                                <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="3.5"><path d="M14 6v16M6 14h16"/></svg>
+                            </button>
+                        ) : (
+                            <button onClick={function() { setShowSearch(true); }} className="bg-slate-900 text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl shadow-slate-200 active:scale-90 transition-all">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            </button>
+                        )}
+                    </div>
                 </div>
             </header>
 
