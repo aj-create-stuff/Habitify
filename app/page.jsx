@@ -45,7 +45,16 @@ function getDayOfYear() {
 function calculatePerformance(habit, logs) {
     var currentDay = Math.max(1, getDayOfYear());
     var actual = (logs || []).filter(function(l) { return l.habitId === habit.id; }).length;
-    var expected = (habit.target / 365) * currentDay;
+
+    var startDay = habit.createdAtDay || 0;
+    var expected = 0;
+    if (startDay < 365) {
+        var remaining = 365 - startDay;
+        var activeDays = Math.max(1, currentDay - startDay);
+        expected = (habit.target / remaining) * activeDays;
+    } else {
+        expected = habit.target;
+    }
     var delta = actual - expected;
 
     var status = 'On Track';
@@ -897,7 +906,23 @@ const AddModal = (props) => {
                 </div>
                 <div className="flex gap-4">
                     <button onClick={props.onClose} className="flex-1 py-5 font-bold text-slate-400">Cancel</button>
-                    <button onClick={function(){if(name && target){props.onSave({id: Date.now().toString(), name: name, target: parseInt(target), type: type, shared: true}); props.onClose();}}} className="flex-[2] py-5 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-100 text-xs uppercase tracking-widest">Create</button>
+                    <button onClick={function(){
+                        if(name && target){
+                            var currentDay = getDayOfYear();
+                            var remainingDays = Math.max(1, 365 - currentDay);
+                            var fullTarget = parseInt(target) || 365;
+                            var proratedTarget = Math.max(1, Math.round(fullTarget * (remainingDays / 365)));
+                            props.onSave({
+                                id: Date.now().toString(), 
+                                name: name, 
+                                target: proratedTarget, 
+                                type: type, 
+                                shared: true,
+                                createdAtDay: currentDay
+                            }); 
+                            props.onClose();
+                        }
+                    }} className="flex-[2] py-5 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-100 text-xs uppercase tracking-widest">Create</button>
                 </div>
             </div>
         </div>
