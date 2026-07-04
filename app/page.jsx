@@ -299,43 +299,49 @@ const LoginScreen = (props) => {
     async function handleSendCode() {
         if (!email.includes('@')) { alert("Invalid email"); return; }
         setLoading(true);
-        const { error } = await supabase.auth.signInWithOtp({ email });
-        setLoading(false);
-        if (error) alert(error.message);
-        else setStep('otp');
+        try {
+            const res = await fetch('/api/auth/otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            setLoading(false);
+            if (res.ok && data.success) {
+                setStep('otp');
+            } else {
+                alert(data.error || "Failed to send code");
+            }
+        } catch (e) {
+            setLoading(false);
+            alert("Network error. Please try again.");
+            console.error(e);
+        }
     }
 
     async function handleVerify() {
         if (otp.length < 6) { alert("Enter code"); return; }
         setLoading(true);
-
-        var res = await supabase.auth.verifyOtp({ email: email, token: otp, type: 'magiclink' });
-
-        if (res.error) {
-            res = await supabase.auth.verifyOtp({ email: email, token: otp, type: 'signup' });
-        }
-
-        if (res.error) {
-            res = await supabase.auth.verifyOtp({ email: email, token: otp, type: 'login' });
-        }
-
-        if (res.error) {
-            alert("Error: " + res.error.message + " (Check if code is correct)");
+        try {
+            const res = await fetch('/api/auth/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, token: otp })
+            });
+            const data = await res.json();
             setLoading(false);
-            return;
-        }
-
-        const profileResponse = await supabase.from('profiles').select('*').eq('email', email).maybeSingle();
-        const cloudProfile = profileResponse.data;
-
-        setLoading(false);
-        if (cloudProfile) {
-            props.onAuth(cloudProfile);
-        } else {
-            const newId = 'u' + Math.random().toString(36).substr(2, 9);
-            const newProfile = { id: newId, name: email.split('@')[0], avatar: '👋', email: email, is_searchable: true };
-            await supabase.from('profiles').insert(newProfile);
-            props.onAuth(newProfile);
+            if (res.ok && data.success) {
+                if (data.session) {
+                    await supabase.auth.setSession(data.session);
+                }
+                props.onAuth(data.profile);
+            } else {
+                alert(data.error || "Failed to verify code");
+            }
+        } catch (e) {
+            setLoading(false);
+            alert("Network error. Please try again.");
+            console.error(e);
         }
     }
 
