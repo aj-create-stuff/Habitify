@@ -15,14 +15,18 @@ export async function POST(request) {
     }
 
     // Fetch SMTP configurations securely from Supabase database
-    const { data: smtpConfig, error: dbErr } = await supabase
+    // Fetch the latest SMTP configurations securely from Supabase database
+    const { data: smtpRows, error: dbErr } = await supabase
       .from('smtp_config')
       .select('*')
-      .single();
+      .order('id', { ascending: false })
+      .limit(1);
 
-    if (dbErr || !smtpConfig || Object.keys(smtpConfig).length === 0) {
+    const smtpConfig = smtpRows && smtpRows[0];
+
+    if (dbErr || !smtpConfig) {
       return NextResponse.json(
-        { success: false, error: 'SMTP Configuration is empty or not found in your Supabase database table "smtp_config". Please ensure a row exists with your host, port, email, and password.' },
+        { success: false, error: 'SMTP Configuration is empty or not found in your Supabase database table "smtp_config". Please ensure a row exists with your email and password.' },
         { status: 500 }
       );
     }
