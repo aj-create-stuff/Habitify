@@ -408,7 +408,7 @@ const SocialList = (props) => {
         }
         setInviting(true);
         try {
-            const inviteLink = "https://ioair.link/euymv7";
+            const inviteLink = "https://habitify-pearl.vercel.app";
             const htmlBody = `<div style="font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif; background-color: #f8fafc; padding: 32px 24px; border-radius: 32px; max-width: 600px; margin: 0 auto; color: #1e293b; border: 1px solid #e2e8f0; text-align: center;">` +
                 `<div style="text-align: center; margin-bottom: 20px;"><span style="font-size: 28px; font-weight: 800; color: #10b981; letter-spacing: -1px;">Habitify Social</span></div>` +
                 `<h3 style="margin: 20px 0 8px 0; font-size: 20px; font-weight: 800; color: #0f172a;">You have been invited!</h3>` +
@@ -445,7 +445,7 @@ const SocialList = (props) => {
     };
 
     const handleWhatsAppShare = () => {
-        const inviteLink = "https://ioair.link/euymv7";
+        const inviteLink = "https://habitify-pearl.vercel.app";
         const message = `Hey! Join me on Habitify to track habits together and compete on the leaderboard! ${inviteLink}`;
         const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
