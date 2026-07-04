@@ -347,7 +347,11 @@ const LoginScreen = (props) => {
                 </div>
                 <div className="space-y-2">
                     <h2 className="text-3xl font-black text-slate-900 tracking-tighter">Habitify</h2>
-                    <p className="text-sm text-slate-400 font-medium">{step === 'email' ? 'Enter email for your secure login code' : 'Check your inbox for the secure login code'}</p>
+                    <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                        {step === 'email' 
+                            ? 'New or existing user? Enter your email ID below to sign up or log in with a secure one-time code.' 
+                            : 'Check your inbox for the secure verification code.'}
+                    </p>
                 </div>
 
                 <div className="space-y-4">
