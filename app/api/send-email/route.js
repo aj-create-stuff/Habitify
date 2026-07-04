@@ -8,7 +8,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 export async function POST(request) {
   try {
-    const { toEmail, htmlBody } = await request.json();
+    const { toEmail, htmlBody, subject } = await request.json();
 
     if (!toEmail || !htmlBody) {
       return NextResponse.json({ success: false, error: 'Missing parameters' }, { status: 400 });
@@ -45,7 +45,7 @@ export async function POST(request) {
     const mailOptions = {
       from: `"Habitify Stats" <${smtpConfig.email}>`,
       to: toEmail,
-      subject: 'Habitify Stats Report',
+      subject: subject || 'Habitify Stats Report',
       html: htmlBody,
     };
 

@@ -426,7 +426,8 @@ const SocialList = (props) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     toEmail: friendEmail,
-                    htmlBody: htmlBody
+                    htmlBody: htmlBody,
+                    subject: `${props.profile.name} invited you to join Habitify Social!`
                 })
             });
 
@@ -818,7 +819,8 @@ const ProfileModal = (props) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     toEmail: props.profile.email,
-                    htmlBody: htmlBody
+                    htmlBody: htmlBody,
+                    subject: `Habitify Weekly Stats for ${props.profile.name}`
                 })
             });
 
