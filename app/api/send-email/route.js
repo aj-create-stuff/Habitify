@@ -20,9 +20,9 @@ export async function POST(request) {
       .select('*')
       .single();
 
-    if (dbErr || !smtpConfig) {
+    if (dbErr || !smtpConfig || Object.keys(smtpConfig).length === 0) {
       return NextResponse.json(
-        { success: false, error: 'SMTP Configuration not found in Supabase database' },
+        { success: false, error: 'SMTP Configuration is empty or not found in your Supabase database table "smtp_config". Please ensure a row exists with your host, port, email, and password.' },
         { status: 500 }
       );
     }
