@@ -892,9 +892,10 @@ const AddModal = (props) => {
     const [name, setName] = useState(props.initialName || '');
     const [target, setTarget] = useState(props.initialName ? '260' : '');
     const [type, setType] = useState('do');
+    const [showGuide, setShowGuide] = useState(true);
     return (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
-            <div className="bg-white w-full max-w-md rounded-[3rem] p-8 pb-10 space-y-8 slide-up shadow-2xl">
+            <div className="bg-white w-full max-w-md rounded-[3rem] p-8 pb-10 space-y-6 slide-up shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
                 <h2 className="text-2xl font-black text-slate-900 text-center">{props.initialName ? 'Adopt' : 'New Habit'}</h2>
                 <div className="flex p-1.5 bg-slate-100 rounded-2xl">
                     <button onClick={function(){setType('do');}} className={`flex-1 py-4 font-bold rounded-xl ${type === 'do' ? 'bg-white text-emerald-600' : 'text-slate-400'}`}>DO</button>
@@ -902,8 +903,40 @@ const AddModal = (props) => {
                 </div>
                 <div className="space-y-4">
                     <input value={name} readOnly={!!props.initialName} onChange={function(e){setName(e.target.value);}} placeholder="Habit Name" className="w-full p-5 bg-slate-50 rounded-2xl outline-none font-bold text-slate-800" />
-                    <input type="number" autoFocus={!!props.initialName} value={target} onChange={function(e){setTarget(e.target.value);}} placeholder="Annual Target" className="w-full p-5 bg-slate-50 rounded-2xl outline-none font-bold text-slate-800" />
+                    <input type="number" autoFocus={!!props.initialName} value={target} onChange={function(e){setTarget(e.target.value);}} placeholder="Annual Target (e.g. 200)" className="w-full p-5 bg-slate-50 rounded-2xl outline-none font-bold text-slate-800" />
                 </div>
+                
+                <div className="bg-slate-50 p-5 rounded-3xl space-y-3 border border-slate-100">
+                    <div className="flex justify-between items-center cursor-pointer select-none" onClick={function(){ setShowGuide(!showGuide); }}>
+                        <span className="text-xs font-black text-slate-700 flex items-center gap-1.5">
+                            💡 {type === 'do' ? 'DO Habit Guidelines' : "DON'T Habit Guidelines"}
+                        </span>
+                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-wider">
+                            {showGuide ? 'Hide Tips' : 'Show Tips'}
+                        </span>
+                    </div>
+                    {showGuide && (
+                        <div className="text-xs space-y-3 pt-3 border-t border-slate-200/60 transition-all">
+                            <div className="space-y-1">
+                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest block">✔️ Dos</span>
+                                <p className="text-slate-600 font-medium leading-relaxed whitespace-pre-line">
+                                    {type === 'do' 
+                                        ? '• Choose specific actions (e.g., "Read 20 mins" instead of "Read more").\n• Pick a realistic annual target (e.g., 200/365 days) to build long-term consistency.'
+                                        : '• Focus on habits to break or avoid (e.g., "No soda", "Limit TV to 1hr").\n• The annual target represents target days you successfully avoid the habit.'}
+                                </p>
+                            </div>
+                            <div className="space-y-1">
+                                <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest block">❌ Don\'ts</span>
+                                <p className="text-slate-600 font-medium leading-relaxed whitespace-pre-line">
+                                    {type === 'do'
+                                        ? '• Don\'t make habits vague (avoid "Be healthier" or "Study hard").\n• Don\'t set target to 365 initially; leave room for off days.'
+                                        : '• Don\'t use negative wording if a positive habit can track it better (e.g., use "Drink 3L Water" instead of "Don\'t dehydrate").'}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 <div className="flex gap-4">
                     <button onClick={props.onClose} className="flex-1 py-5 font-bold text-slate-400">Cancel</button>
                     <button onClick={function(){
