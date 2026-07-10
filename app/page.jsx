@@ -112,6 +112,7 @@ const Page = () => {
     const [profile, setProfile] = useState(function() { return STORAGE.load('hab_v6_profile', {
         id: '', name: 'New User', avatar: '👋', email: '', is_searchable: true
     }); });
+    const [initialSyncDone, setInitialSyncDone] = useState(!isAuth);
     const [view, setView] = useState('home');
     const [showAdd, setShowAdd] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
@@ -138,30 +139,44 @@ const Page = () => {
         return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
     }, []);
 
-    useEffect(function() { STORAGE.save('hab_v6_list', habits); if(isAuth) syncWithSupabase(); }, [habits]);
-    useEffect(function() { STORAGE.save('hab_v6_logs', logs); if(isAuth) syncWithSupabase(); }, [logs]);
-    useEffect(function() { STORAGE.save('hab_v6_friends', friends); if(isAuth) syncWithSupabase(); }, [friends]);
-    useEffect(function() { STORAGE.save('hab_v6_profile', profile); if(isAuth) syncWithSupabase(); }, [profile]);
+    useEffect(function() { STORAGE.save('hab_v6_list', habits); if(isAuth && initialSyncDone) syncWithSupabase(); }, [habits]);
+    useEffect(function() { STORAGE.save('hab_v6_logs', logs); if(isAuth && initialSyncDone) syncWithSupabase(); }, [logs]);
+    useEffect(function() { STORAGE.save('hab_v6_friends', friends); if(isAuth && initialSyncDone) syncWithSupabase(); }, [friends]);
+    useEffect(function() { STORAGE.save('hab_v6_profile', profile); if(isAuth && initialSyncDone) syncWithSupabase(); }, [profile]);
     useEffect(function() { if(profile.email) STORAGE.save('hab_v6_email', profile.email); }, [profile.email]);
 
     // Auto-Restore Session
     useEffect(function() {
         async function handleAuth() {
-            var sessionResponse = await supabase.auth.getSession();
-            var session = sessionResponse.data.session;
-            if (session && session.user && session.user.email) {
-                var cloudProfileResponse = await supabase.from('profiles').select('*').eq('email', session.user.email).single();
-                var cloudProfile = cloudProfileResponse.data;
-                if (cloudProfile) {
-                    setProfile(cloudProfile);
-                    setIsAuth(true);
-                    if (habits.length === 0) setHabits(migrateHabits(cloudProfile.habits_data || []));
-                    if (logs.length === 0) setLogs(cloudProfile.logs_data || []);
-                    if (friends.length === 0 && cloudProfile.friends_data) setFriends(cloudProfile.friends_data);
+            try {
+                var sessionResponse = await supabase.auth.getSession();
+                var session = sessionResponse.data.session;
+                if (session && session.user && session.user.email) {
+                    var cloudProfileResponse = await supabase.from('profiles').select('*').eq('email', session.user.email).single();
+                    var cloudProfile = cloudProfileResponse.data;
+                    if (cloudProfile) {
+                        setProfile(cloudProfile);
+                        setIsAuth(true);
+                        setHabits(migrateHabits(cloudProfile.habits_data || []));
+                        setLogs(cloudProfile.logs_data || []);
+                        if (cloudProfile.friends_data) {
+                            setFriends(cloudProfile.friends_data);
+                        } else {
+                            setFriends([]);
+                        }
+                    }
                 }
+            } catch (e) {
+                console.error("Auto-restore session failed:", e);
+            } finally {
+                setInitialSyncDone(true);
             }
         }
-        handleAuth();
+        if (isAuth) {
+            handleAuth();
+        } else {
+            setInitialSyncDone(true);
+        }
     }, []);
 
     async function syncWithSupabase() {
