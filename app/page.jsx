@@ -92,6 +92,88 @@ function migrateHabits(list) {
     return newList;
 }
 
+function getStartDateForStreak(habit, logs) {
+    if (habit.createdAtDay !== undefined && habit.createdAtDay !== null) {
+        var year = new Date().getFullYear();
+        var date = new Date(year, 0, 1);
+        date.setDate(date.getDate() + habit.createdAtDay);
+        if (date > new Date()) return new Date();
+        return date;
+    }
+    var habitLogs = (logs || []).filter(function(l) { return l.habitId === habit.id; });
+    if (habitLogs.length > 0) {
+        var oldest = habitLogs.reduce(function(oldest, log) {
+            return (new Date(log.date) < new Date(oldest)) ? log.date : oldest;
+        }, habitLogs[0].date);
+        return new Date(oldest);
+    }
+    var d = new Date();
+    d.setDate(d.getDate() - 10);
+    return d;
+}
+
+function calculateCurrentStreak(habit, logs) {
+    var habitLogs = (logs || []).filter(function(l) { return l.habitId === habit.id; });
+    var loggedDates = new Set(habitLogs.map(function(l) { return l.date; }));
+    
+    var currentStreak = 0;
+    var checkDate = new Date();
+    
+    var todayStr = format(new Date(), 'yyyy-MM-dd');
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    var yesterdayStr = format(yesterday, 'yyyy-MM-dd');
+    
+    if (habit.type === 'do') {
+        var i = 0;
+        while (i < 366) {
+            var dateStr = format(checkDate, 'yyyy-MM-dd');
+            var isLogged = loggedDates.has(dateStr);
+            if (isLogged) {
+                currentStreak++;
+            } else {
+                if (i === 0) {
+                    var yestLogged = loggedDates.has(yesterdayStr);
+                    if (!yestLogged) {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+            checkDate.setDate(checkDate.getDate() - 1);
+            i++;
+        }
+    } else {
+        var startDate = getStartDateForStreak(habit, logs);
+        var startCheck = new Date();
+        startCheck.setHours(0,0,0,0);
+        startDate.setHours(0,0,0,0);
+        
+        while (startCheck >= startDate) {
+            var dateStr = format(startCheck, 'yyyy-MM-dd');
+            var isViolated = loggedDates.has(dateStr);
+            if (!isViolated) {
+                currentStreak++;
+            } else {
+                break;
+            }
+            startCheck.setDate(startCheck.getDate() - 1);
+        }
+    }
+    return currentStreak;
+}
+
+function getBadgeIcon(streak, type) {
+    if (streak === 5) return { emoji: '🥉', title: '5-Day Streak', bg: 'bg-amber-50 text-amber-800 border-amber-200' };
+    if (streak === 10) return { emoji: '🥈', title: '10-Day Streak', bg: 'bg-slate-50 text-slate-800 border-slate-200' };
+    if (streak === 15) return { emoji: '🥇', title: '15-Day Streak', bg: 'bg-yellow-50 text-yellow-800 border-yellow-200' };
+    if (streak === 30) return { emoji: '💎', title: '30-Day Streak', bg: 'bg-indigo-50 text-indigo-800 border-indigo-200' };
+    if (streak === 50) return { emoji: '👑', title: '50-Day Streak', bg: 'bg-purple-50 text-purple-800 border-purple-200' };
+    if (streak === 100) return { emoji: '🔥', title: 'Centurion', bg: 'bg-orange-50 text-orange-800 border-orange-200' };
+    return { emoji: '🚀', title: 'Legendary ' + streak + '-Day', bg: 'bg-rose-50 text-rose-800 border-rose-200' };
+}
+
 // --- SUPABASE CONFIG ---
 const SUPABASE_URL = 'https://rxhrcdpzvwevvqkwaaus.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4aHJjZHB6dndldnZxa3dhYXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MzcxMTQsImV4cCI6MjA5NjMxMzExNH0.qX-mYTvleNW-rGjqXISHNpx2Sar7ujsmWeRw3j9P2xo';
@@ -126,8 +208,10 @@ const Page = () => {
     const [logs, setLogs] = useState(function() { return STORAGE.load('hab_v6_logs', []); });
     const [friends, setFriends] = useState(function() { return STORAGE.load('hab_v6_friends', []); });
     const [profile, setProfile] = useState(function() { return STORAGE.load('hab_v6_profile', {
-        id: '', name: 'New User', avatar: '👋', email: '', is_searchable: true
+        id: '', name: 'New User', avatar: '👋', email: '', is_searchable: true, badges: [], lastStreakCheck: ''
     }); });
+    const [newlyEarnedBadges, setNewlyEarnedBadges] = useState([]);
+    const [showCelebration, setShowCelebration] = useState(false);
     const [initialSyncDone, setInitialSyncDone] = useState(!isAuth);
     const [view, setView] = useState('home');
     const [showAdd, setShowAdd] = useState(false);
@@ -195,6 +279,56 @@ const Page = () => {
             setInitialSyncDone(true);
         }
     }, []);
+
+    // Streak & Badge Check on Initial load/sync
+    useEffect(function() {
+        if (!isAuth || !initialSyncDone) return;
+        
+        var todayStr = format(new Date(), 'yyyy-MM-dd');
+        if (profile.lastStreakCheck === todayStr) return;
+        
+        var currentBadges = profile.badges || [];
+        var earnedThisCheck = [];
+        var updatedBadges = [...currentBadges];
+        var milestones = [5, 10, 15, 30, 50, 100, 365];
+        
+        habits.forEach(function(h) {
+            var streak = calculateCurrentStreak(h, logs);
+            if (streak > 0) {
+                milestones.forEach(function(m) {
+                    if (streak >= m) {
+                        var alreadyHas = currentBadges.some(function(b) {
+                            return b.habitId === h.id && b.streak === m;
+                        });
+                        if (!alreadyHas) {
+                            var badge = {
+                                id: h.id + '-' + m + '-' + Date.now(),
+                                habitId: h.id,
+                                habitName: h.name,
+                                streak: m,
+                                dateAwarded: todayStr,
+                                type: h.type
+                            };
+                            earnedThisCheck.push(badge);
+                            updatedBadges.push(badge);
+                        }
+                    }
+                });
+            }
+        });
+        
+        if (earnedThisCheck.length > 0) {
+            setNewlyEarnedBadges(earnedThisCheck);
+            setShowCelebration(true);
+            setProfile(function(prev) {
+                return { ...prev, badges: updatedBadges, lastStreakCheck: todayStr };
+            });
+        } else {
+            setProfile(function(prev) {
+                return { ...prev, lastStreakCheck: todayStr };
+            });
+        }
+    }, [isAuth, initialSyncDone]);
 
     async function syncWithSupabase() {
         if (!profile.email) return;
@@ -329,6 +463,7 @@ const Page = () => {
                 onUpdate={function(updated) { setHabits(habits.map(function(h) { return h.id === updated.id ? updated : h; })); setViewingHabit(updated); }}
                 onDelete={function(id) { if(window.confirm("Delete?")) { setHabits(habits.filter(function(h) { return h.id !== id; })); setViewingHabit(null); } }}
             />}
+            {showCelebration && <StreakCelebrationModal badges={newlyEarnedBadges} onClose={function() { setShowCelebration(false); }} />}
         </div>
     );
 };
@@ -899,6 +1034,32 @@ const ProfileModal = (props) => {
                     <div className="space-y-1"><label className="text-[10px] font-black text-slate-300 uppercase ml-2">Display Name</label><input value={name} onChange={function(e){setName(e.target.value); setError('');}} className="w-full p-4 bg-slate-50 rounded-2xl outline-none font-bold text-slate-800" /></div>
                     {error && <p className="text-rose-500 text-xs font-bold text-center">{error}</p>}
                 </div>
+
+                {/* Badges Section */}
+                <div className="space-y-3 pt-4 border-t border-slate-100 text-left">
+                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest ml-2">My Badges 🏆</h3>
+                    {(!props.profile.badges || props.profile.badges.length === 0) ? (
+                        <p className="text-xs font-semibold text-slate-400 text-center py-4 bg-slate-50 rounded-2xl">
+                            No badges earned yet. Keep your streaks alive!
+                        </p>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-3 max-h-44 overflow-y-auto pr-1 no-scrollbar">
+                            {props.profile.badges.map(function(badge) {
+                                var info = getBadgeIcon(badge.streak, badge.type);
+                                return (
+                                    <div key={badge.id} className={`flex items-center gap-2.5 p-2.5 rounded-2xl border text-left ${info.bg}`}>
+                                        <span className="text-2xl">{info.emoji}</span>
+                                        <div className="min-w-0">
+                                            <p className="text-[10px] font-black uppercase tracking-tight truncate">{badge.habitName}</p>
+                                            <p className="text-[9px] font-bold opacity-80">{info.title}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
                 <div className="pt-6 border-t border-slate-100 space-y-4 text-center">
                     {props.installPrompt && (
                         <button onClick={props.triggerInstall} className="w-full py-4 bg-emerald-50 text-emerald-700 rounded-2xl text-xs font-black uppercase tracking-widest shadow-sm">
@@ -1055,6 +1216,52 @@ const CalendarModal = (props) => {
                         );
                     })}
                 </div>
+            </div>
+        </div>
+    );
+};
+
+const StreakCelebrationModal = (props) => {
+    return (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-lg flex items-center justify-center p-6">
+            <div className="bg-white w-full max-w-sm rounded-[3rem] p-8 text-center space-y-6 slide-up shadow-2xl relative overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none opacity-40">
+                    <div className="confetti-particle bg-emerald-500 left-[10%] animation-delay-100"></div>
+                    <div className="confetti-particle bg-rose-500 left-[30%] animation-delay-300"></div>
+                    <div className="confetti-particle bg-amber-500 left-[50%] animation-delay-500"></div>
+                    <div className="confetti-particle bg-indigo-500 left-[70%] animation-delay-200"></div>
+                    <div className="confetti-particle bg-purple-500 left-[90%] animation-delay-400"></div>
+                </div>
+                
+                <div className="w-24 h-24 bg-emerald-50 rounded-[2.5rem] mx-auto flex items-center justify-center text-5xl shadow-xl shadow-emerald-100/50 animate-bounce">
+                    🎉
+                </div>
+                
+                <div className="space-y-2">
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tighter">Streak Award!</h2>
+                    <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+                        You've unlocked milestone badges for consistency!
+                    </p>
+                </div>
+                
+                <div className="space-y-3 py-2">
+                    {props.badges.map(function(b) {
+                        var info = getBadgeIcon(b.streak, b.type);
+                        return (
+                            <div key={b.id} className={`flex items-center gap-4 p-4 rounded-3xl border ${info.bg} justify-start text-left shadow-sm`}>
+                                <span className="text-3xl">{info.emoji}</span>
+                                <div>
+                                    <h4 className="text-sm font-black uppercase tracking-tight">{b.habitName}</h4>
+                                    <p className="text-[10px] font-bold opacity-80">{info.title} ({b.type === 'do' ? 'Do' : "Don't"})</p>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+                
+                <button onClick={props.onClose} className="w-full py-5 bg-emerald-600 text-white rounded-[2rem] font-black uppercase tracking-widest shadow-xl shadow-emerald-100/50 active:scale-95 transition-all text-xs">
+                    Awesome, Let's Go! 🚀
+                </button>
             </div>
         </div>
     );
