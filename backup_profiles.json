@@ -1,0 +1,694 @@
+[
+  {
+    "id": "uw0usk5u0u",
+    "name": "Mansi",
+    "avatar": "👋",
+    "email": "mansijn@gmail.com",
+    "habits": [
+      "excercise 60 mins",
+      "No Sugar "
+    ],
+    "performance": 0.00333333333333333,
+    "habits_data": [
+      {
+        "id": "1781936062424",
+        "name": "excercise 60 mins",
+        "type": "do",
+        "color": "indigo",
+        "target": 150
+      },
+      {
+        "id": "1781936063944",
+        "name": "No Sugar ",
+        "type": "do",
+        "color": "indigo",
+        "target": 150
+      }
+    ],
+    "logs_data": [
+      {
+        "date": "2026-07-04",
+        "habitId": "1781936062424"
+      }
+    ],
+    "updated_at": "2026-07-07T18:06:43.996+00:00",
+    "habit_stats": {
+      "No Sugar ": {
+        "actual": 0,
+        "target": 150,
+        "percent": 0,
+        "is_shared": true
+      },
+      "Exercise Daily": {
+        "actual": 0,
+        "target": 150,
+        "percent": 0,
+        "is_shared": true
+      }
+    },
+    "is_searchable": true,
+    "friends_data": []
+  },
+  {
+    "id": "uadaxwmn86",
+    "name": "New User",
+    "avatar": "👋",
+    "email": "",
+    "habits": [],
+    "performance": 0,
+    "habits_data": [],
+    "logs_data": [],
+    "updated_at": "2026-06-06T15:49:33.047+00:00",
+    "habit_stats": {},
+    "is_searchable": true,
+    "friends_data": null
+  },
+  {
+    "id": "us6o6elxpp",
+    "name": "neha2418gupta",
+    "avatar": "👋",
+    "email": "neha2418gupta@gmail.com",
+    "habits": [
+      "Exercise Daily"
+    ],
+    "performance": 0,
+    "habits_data": [
+      {
+        "id": "default_exercise",
+        "name": "Exercise Daily",
+        "type": "do",
+        "shared": true,
+        "target": 365
+      }
+    ],
+    "logs_data": [],
+    "updated_at": "2026-07-04T19:25:12.452+00:00",
+    "habit_stats": {
+      "Exercise Daily": {
+        "actual": 0,
+        "target": 365,
+        "percent": 0,
+        "is_shared": true
+      }
+    },
+    "is_searchable": true,
+    "friends_data": []
+  },
+  {
+    "id": "u0moop60gk",
+    "name": "apuljain",
+    "avatar": "👋",
+    "email": "apuljain@gmail.com",
+    "habits": [
+      "Exercise Daily"
+    ],
+    "performance": 0,
+    "habits_data": [
+      {
+        "id": "default_exercise",
+        "name": "Exercise Daily",
+        "type": "do",
+        "shared": true,
+        "target": 365
+      }
+    ],
+    "logs_data": [],
+    "updated_at": "2026-07-04T10:15:29.895+00:00",
+    "habit_stats": {
+      "Exercise Daily": {
+        "actual": 0,
+        "target": 365,
+        "percent": 0,
+        "is_shared": true
+      }
+    },
+    "is_searchable": true,
+    "friends_data": null
+  },
+  {
+    "id": "u_backfill_user",
+    "name": "Apul",
+    "avatar": "🏃‍♂️",
+    "email": "randomsignups.apu@gmail.com",
+    "habits": [
+      "Exercise Daily",
+      "No Sugar "
+    ],
+    "performance": 0.406868131868132,
+    "habits_data": [
+      {
+        "id": "h_gym_backfill",
+        "name": "Exercise Daily",
+        "type": "do",
+        "color": "emerald",
+        "target": 260
+      },
+      {
+        "id": "1780819629248",
+        "name": "No Sugar ",
+        "type": "dont",
+        "target": 70
+      }
+    ],
+    "logs_data": [
+      {
+        "date": "2026-01-03",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-07",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-08",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-09",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-10",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-11",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-17",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-19",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-20",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-21",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-22",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-23",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-24",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-25",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-26",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-27",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-28",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-29",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-30",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-01-31",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-02-02",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-02-03",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-02-07",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-02-11",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-02-14",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-02-22",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-02-24",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-02-25",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-02-27",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-02-28",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-01",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-02",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-06",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-07",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-10",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-12",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-17",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-18",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-19",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-21",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-03-22",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-02",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-06",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-07",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-08",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-09",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-11",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-12",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-16",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-17",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-18",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-21",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-22",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-23",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-27",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-28",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-29",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-04-30",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-04",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-05",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-06",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-07",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-08",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-09",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-10",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-11",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-12",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-13",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-14",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-15",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-17",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-18",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-06-06",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-06-07",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-05-06",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-01-31",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-06-03",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-05-28",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-05-27",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-05-22",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-05-13",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-05-11",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-04-07",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-04-15",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-04-23",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-04-28",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-04-03",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-03-03",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-03-11",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-03-19",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-03-27",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-03-31",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-02-11",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-02-17",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-02-24",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-02-04",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-01-06",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-01-14",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-01-01",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-01-21",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-01-26",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-06-08",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-06-12",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-06-20",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-06-19",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-07-02",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-07-01",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-07-03",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-06-30",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-07-04",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-07-05",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-06-24",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-06-23",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-06-26",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-06-22",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-06-29",
+        "habitId": "1780819629248"
+      },
+      {
+        "date": "2026-07-06",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-07-07",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-07-09",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-07-10",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-07-11",
+        "habitId": "h_gym_backfill"
+      },
+      {
+        "date": "2026-07-11",
+        "habitId": "1780819629248"
+      }
+    ],
+    "updated_at": "2026-07-11T18:20:47.14+00:00",
+    "habit_stats": {
+      "No Sugar ": {
+        "actual": 33,
+        "target": 70,
+        "percent": 0.4714285714285714,
+        "is_shared": true
+      },
+      "Exercise Daily": {
+        "actual": 89,
+        "target": 260,
+        "percent": 0.3423076923076923,
+        "is_shared": true
+      }
+    },
+    "is_searchable": true,
+    "friends_data": [
+      {
+        "id": "uw0usk5u0u",
+        "name": "Mansi",
+        "email": "mansijn@gmail.com",
+        "avatar": "👋",
+        "habits": [
+          "excercise 60 mins",
+          "No Sugar "
+        ],
+        "logs_data": [],
+        "updated_at": "2026-07-01T06:21:30.881+00:00",
+        "habit_stats": {},
+        "habits_data": [
+          {
+            "id": "1781936062424",
+            "name": "excercise 60 mins",
+            "type": "do",
+            "color": "indigo",
+            "target": 150
+          },
+          {
+            "id": "1781936063944",
+            "name": "No Sugar ",
+            "type": "do",
+            "color": "indigo",
+            "target": 150
+          }
+        ],
+        "performance": 0,
+        "friends_data": null,
+        "is_searchable": true
+      }
+    ]
+  }
+]
