@@ -258,13 +258,79 @@ const Page = () => {
                     if (cloudProfile) {
                         setProfile(cloudProfile);
                         setIsAuth(true);
-                        setHabits(migrateHabits(cloudProfile.habits_data || []));
-                        setLogs(cloudProfile.logs_data || []);
-                        if (cloudProfile.friends_data) {
-                            setFriends(cloudProfile.friends_data);
-                        } else {
-                            setFriends([]);
+
+                        // Fetch normalized tables
+                        var habitsResponse = await supabase.from('habits').select('*').eq('user_id', cloudProfile.id);
+                        var logsResponse = await supabase.from('logs').select('*').eq('user_id', cloudProfile.id);
+                        var friendsResponse = await supabase.from('friends').select('friend_id').eq('user_id', cloudProfile.id);
+
+                        var dbHabits = habitsResponse.data || [];
+                        var dbLogs = logsResponse.data || [];
+                        var dbFriendsIds = (friendsResponse.data || []).map(function(f) { return f.friend_id; });
+
+                        // Legacy data fallback for zero-data-loss migration
+                        var legacyHabits = cloudProfile.habits_data || [];
+                        var legacyLogs = cloudProfile.logs_data || [];
+                        var legacyFriends = cloudProfile.friends_data || [];
+
+                        // Migration check:
+                        if (dbHabits.length === 0 && legacyHabits.length > 0) {
+                            console.log("Migrating legacy habits to SQL table...");
+                            var habitsToInsert = legacyHabits.map(function(h) {
+                                return {
+                                    id: h.id,
+                                    user_id: cloudProfile.id,
+                                    name: h.name,
+                                    target: h.target,
+                                    type: h.type,
+                                    shared: h.shared !== false,
+                                    createdAtDay: h.createdAtDay || 0
+                                };
+                            });
+                            await supabase.from('habits').insert(habitsToInsert);
+                            dbHabits = habitsToInsert;
                         }
+
+                        if (dbLogs.length === 0 && legacyLogs.length > 0) {
+                            console.log("Migrating legacy logs to SQL table...");
+                            var habitsIdsSet = new Set(dbHabits.map(function(h) { return h.id; }));
+                            var logsToInsert = legacyLogs.filter(function(l) { return habitsIdsSet.has(l.habitId); }).map(function(l) {
+                                return {
+                                    id: l.habitId + '-' + l.date,
+                                    habit_id: l.habitId,
+                                    user_id: cloudProfile.id,
+                                    log_date: l.date
+                                };
+                            });
+                            if (logsToInsert.length > 0) {
+                                await supabase.from('logs').insert(logsToInsert);
+                            }
+                            dbLogs = logsToInsert;
+                        }
+
+                        if (dbFriendsIds.length === 0 && legacyFriends.length > 0) {
+                            console.log("Migrating legacy friends to SQL table...");
+                            var friendsToInsert = legacyFriends.map(function(f) {
+                                return {
+                                    user_id: cloudProfile.id,
+                                    friend_id: f.id
+                                };
+                            });
+                            await supabase.from('friends').insert(friendsToInsert);
+                            dbFriendsIds = legacyFriends.map(function(f) { return f.id; });
+                        }
+
+                        // Load friends' full profiles dynamically based on their friend IDs
+                        var dbFriendsProfiles = [];
+                        if (dbFriendsIds.length > 0) {
+                            var friendsProfilesResponse = await supabase.from('profiles').select('*').in('id', dbFriendsIds);
+                            dbFriendsProfiles = friendsProfilesResponse.data || [];
+                        }
+
+                        // Set React state
+                        setHabits(migrateHabits(dbHabits));
+                        setLogs(dbLogs.map(function(l) { return { habitId: l.habit_id, date: l.log_date }; }));
+                        setFriends(dbFriendsProfiles);
                     }
                 }
             } catch (e) {
@@ -340,35 +406,132 @@ const Page = () => {
         });
         
         var payload = {
-            id: profile.id, name: profile.name, avatar: profile.avatar, email: profile.email,
+            id: profile.id, 
+            name: profile.name, 
+            avatar: profile.avatar, 
+            email: profile.email,
             is_searchable: profile.is_searchable !== false,
             habits: habits.filter(function(h) { return h.shared !== false; }).map(function(h) { return h.name; }),
-            habit_stats: stats, performance: totalPerf, habits_data: habits, logs_data: logs, updated_at: new Date()
+            habit_stats: stats, 
+            performance: totalPerf, 
+            badges: profile.badges || [],
+            lastStreakCheck: profile.lastStreakCheck || '',
+            updated_at: new Date()
         };
 
         try {
-            payload.friends_data = friends;
             const { error } = await supabase.from('profiles').upsert(payload);
             if (error) {
-                if (error.message.includes('friends_data') || error.code === '42703') {
-                    // Fallback to query without friends_data
-                    delete payload.friends_data;
-                    await supabase.from('profiles').upsert(payload);
-                    console.warn("friends_data column is missing in Supabase. Run: ALTER TABLE profiles ADD COLUMN friends_data JSONB;");
-                } else {
-                    console.error("Supabase Sync Error:", error);
-                }
+                console.error("Supabase Sync Error:", error);
             }
         } catch (e) {
             console.error("Sync Error:", e);
         }
     }
 
-    function logToday(id, date) {
+    async function logToday(id, date) {
         var targetDate = date ? (typeof date === 'string' ? date : format(date, 'yyyy-MM-dd')) : format(new Date(), 'yyyy-MM-dd');
         var exists = logs.find(function(l) { return l.habitId === id && l.date === targetDate; });
-        if (exists) setLogs(logs.filter(function(l) { return l !== exists; }));
-        else setLogs([...logs, { habitId: id, date: targetDate }]);
+        if (exists) {
+            setLogs(logs.filter(function(l) { return l !== exists; }));
+            if (isAuth) {
+                try {
+                    await supabase.from('logs').delete().eq('habit_id', id).eq('log_date', targetDate);
+                } catch (e) {
+                    console.error("Failed to delete log in Supabase:", e);
+                }
+            }
+        } else {
+            setLogs([...logs, { habitId: id, date: targetDate }]);
+            if (isAuth) {
+                try {
+                    await supabase.from('logs').insert({
+                        id: id + '-' + targetDate,
+                        habit_id: id,
+                        user_id: profile.id,
+                        log_date: targetDate
+                    });
+                } catch (e) {
+                    console.error("Failed to insert log in Supabase:", e);
+                }
+            }
+        }
+    }
+
+    async function addHabit(h) {
+        setHabits([...habits, h]);
+        if (isAuth) {
+            try {
+                await supabase.from('habits').insert({
+                    id: h.id,
+                    user_id: profile.id,
+                    name: h.name,
+                    target: h.target,
+                    type: h.type,
+                    shared: h.shared !== false,
+                    createdAtDay: h.createdAtDay || 0
+                });
+            } catch (e) {
+                console.error("Failed to add habit to Supabase:", e);
+            }
+        }
+    }
+
+    async function updateHabit(updated) {
+        setHabits(habits.map(function(h) { return h.id === updated.id ? updated : h; }));
+        if (isAuth) {
+            try {
+                await supabase.from('habits').upsert({
+                    id: updated.id,
+                    user_id: profile.id,
+                    name: updated.name,
+                    target: updated.target,
+                    type: updated.type,
+                    shared: updated.shared !== false,
+                    createdAtDay: updated.createdAtDay || 0
+                });
+            } catch (e) {
+                console.error("Failed to update habit on Supabase:", e);
+            }
+        }
+    }
+
+    async function deleteHabit(id) {
+        setHabits(habits.filter(function(h) { return h.id !== id; }));
+        if (isAuth) {
+            try {
+                await supabase.from('habits').delete().eq('id', id);
+            } catch (e) {
+                console.error("Failed to delete habit from Supabase:", e);
+            }
+        }
+    }
+
+    async function addFriend(u) {
+        if (!friends.find(function(f) { return f.id === u.id; })) {
+            setFriends([...friends, u]);
+            if (isAuth) {
+                try {
+                    await supabase.from('friends').insert({
+                        user_id: profile.id,
+                        friend_id: u.id
+                    });
+                } catch (e) {
+                    console.error("Failed to add friend to Supabase:", e);
+                }
+            }
+        }
+    }
+
+    async function removeFriend(id) {
+        setFriends(friends.filter(function(f) { return f.id !== id; }));
+        if (isAuth) {
+            try {
+                await supabase.from('friends').delete().eq('user_id', profile.id).eq('friend_id', id);
+            } catch (e) {
+                console.error("Failed to remove friend from Supabase:", e);
+            }
+        }
     }
 
     const triggerInstall = async () => {
@@ -436,7 +599,7 @@ const Page = () => {
                 {view === 'home' ? (
                     <HabitList habits={habits} logs={logs} onLog={logToday} onSelect={setViewingHabit} />
                 ) : (
-                    <SocialList profile={profile} friends={friends} habits={habits} logs={logs} onRemoveFriend={function(id) { setFriends(friends.filter(function(f) { return f.id !== id; })); }} onAdopt={setAdoptingHabitName} />
+                    <SocialList profile={profile} friends={friends} habits={habits} logs={logs} onRemoveFriend={removeFriend} onAdopt={setAdoptingHabitName} />
                 )}
             </main>
 
@@ -454,14 +617,14 @@ const Page = () => {
                 </button>
             </nav>
 
-            {showAdd && <AddModal onSave={function(h) { setHabits([...habits, h]); }} onClose={function() { setShowAdd(false); }} />}
-            {adoptingHabitName && <AddModal initialName={adoptingHabitName} onSave={function(h) { setHabits([...habits, h]); setAdoptingHabitName(null); }} onClose={function() { setAdoptingHabitName(null); }} />}
-            {showSearch && <SearchModal friends={friends} profile={profile} onAdd={function(u) { if (!friends.find(function(f) { return f.id === u.id; })) setFriends([...friends, u]); }} onClose={function() { setShowSearch(false); }} />}
+            {showAdd && <AddModal onSave={addHabit} onClose={function() { setShowAdd(false); }} />}
+            {adoptingHabitName && <AddModal initialName={adoptingHabitName} onSave={addHabit} onClose={function() { setAdoptingHabitName(null); }} />}
+            {showSearch && <SearchModal friends={friends} profile={profile} onAdd={addFriend} onClose={function() { setShowSearch(false); }} />}
             {showProfile && <ProfileModal profile={profile} habits={habits} logs={logs} friends={friends} installPrompt={installPrompt} triggerInstall={triggerInstall} onSave={setProfile} onSwitch={function(p, h, l) { setProfile(p); setHabits(h); setLogs(l); }} onClose={function() { setShowProfile(false); }} />}
             {viewingHabit && <CalendarModal habit={viewingHabit} logs={logs} onClose={function() { setViewingHabit(null); }}
                 onToggle={logToday}
-                onUpdate={function(updated) { setHabits(habits.map(function(h) { return h.id === updated.id ? updated : h; })); setViewingHabit(updated); }}
-                onDelete={function(id) { if(window.confirm("Delete?")) { setHabits(habits.filter(function(h) { return h.id !== id; })); setViewingHabit(null); } }}
+                onUpdate={updateHabit}
+                onDelete={deleteHabit}
             />}
             {showCelebration && <StreakCelebrationModal badges={newlyEarnedBadges} onClose={function() { setShowCelebration(false); }} />}
         </div>
