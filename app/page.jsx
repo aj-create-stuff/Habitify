@@ -289,7 +289,7 @@ const Page = () => {
                                     target: h.target,
                                     type: h.type,
                                     shared: h.shared !== false,
-                                    createdAtDay: h.createdAtDay || 0
+                                    created_at_day: h.createdAtDay || 0
                                 };
                             });
                             var { error: habitInsertError } = await supabase.from('habits').insert(habitsToInsert);
@@ -344,8 +344,18 @@ const Page = () => {
                             dbFriendsProfiles = friendsProfilesResponse.data || [];
                         }
 
-                        // Set React state
-                        setHabits(migrateHabits(dbHabits));
+                        // Set React state with mapped camelCase properties
+                        var mappedHabits = dbHabits.map(function(h) {
+                            return {
+                                id: h.id,
+                                name: h.name,
+                                target: h.target,
+                                type: h.type,
+                                shared: h.shared !== false,
+                                createdAtDay: h.created_at_day !== undefined ? h.created_at_day : (h.createdAtDay || 0)
+                            };
+                        });
+                        setHabits(migrateHabits(mappedHabits));
                         setLogs(dbLogs.map(function(l) { return { habitId: l.habit_id, date: l.log_date }; }));
                         setFriends(dbFriendsProfiles);
                     }
@@ -486,7 +496,7 @@ const Page = () => {
                     target: h.target,
                     type: h.type,
                     shared: h.shared !== false,
-                    createdAtDay: h.createdAtDay || 0
+                    created_at_day: h.createdAtDay || 0
                 });
             } catch (e) {
                 console.error("Failed to add habit to Supabase:", e);
@@ -505,7 +515,7 @@ const Page = () => {
                     target: updated.target,
                     type: updated.type,
                     shared: updated.shared !== false,
-                    createdAtDay: updated.createdAtDay || 0
+                    created_at_day: updated.createdAtDay || 0
                 });
             } catch (e) {
                 console.error("Failed to update habit on Supabase:", e);
