@@ -151,8 +151,9 @@ const Page = () => {
             try {
                 var sessionResponse = await supabase.auth.getSession();
                 var session = sessionResponse.data.session;
-                if (session && session.user && session.user.email) {
-                    var cloudProfileResponse = await supabase.from('profiles').select('*').eq('email', session.user.email).single();
+                var email = (session && session.user && session.user.email) || STORAGE.load('hab_v6_email', '');
+                if (email) {
+                    var cloudProfileResponse = await supabase.from('profiles').select('*').eq('email', email).single();
                     var cloudProfile = cloudProfileResponse.data;
                     if (cloudProfile) {
                         setProfile(cloudProfile);
