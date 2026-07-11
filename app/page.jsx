@@ -95,7 +95,23 @@ function migrateHabits(list) {
 // --- SUPABASE CONFIG ---
 const SUPABASE_URL = 'https://rxhrcdpzvwevvqkwaaus.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4aHJjZHB6dndldnZxa3dhYXVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3MzcxMTQsImV4cCI6MjA5NjMxMzExNH0.qX-mYTvleNW-rGjqXISHNpx2Sar7ujsmWeRw3j9P2xo';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+        storage: {
+            getItem: function(key) {
+                return STORAGE.load(key, null);
+            },
+            setItem: function(key, value) {
+                STORAGE.save(key, value);
+            },
+            removeItem: function(key) {
+                STORAGE.save(key, null);
+            }
+        },
+        autoRefreshToken: true,
+        persistSession: true
+    }
+});
 
 const Page = () => {
     const [mounted, setMounted] = useState(false);
