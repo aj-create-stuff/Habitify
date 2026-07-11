@@ -261,8 +261,13 @@ const Page = () => {
 
                         // Fetch normalized tables
                         var habitsResponse = await supabase.from('habits').select('*').eq('user_id', cloudProfile.id);
+                        if (habitsResponse.error) console.error("Error fetching habits:", habitsResponse.error);
+                        
                         var logsResponse = await supabase.from('logs').select('*').eq('user_id', cloudProfile.id);
+                        if (logsResponse.error) console.error("Error fetching logs:", logsResponse.error);
+                        
                         var friendsResponse = await supabase.from('friends').select('friend_id').eq('user_id', cloudProfile.id);
+                        if (friendsResponse.error) console.error("Error fetching friends:", friendsResponse.error);
 
                         var dbHabits = habitsResponse.data || [];
                         var dbLogs = logsResponse.data || [];
@@ -287,8 +292,12 @@ const Page = () => {
                                     createdAtDay: h.createdAtDay || 0
                                 };
                             });
-                            await supabase.from('habits').insert(habitsToInsert);
-                            dbHabits = habitsToInsert;
+                            var { error: habitInsertError } = await supabase.from('habits').insert(habitsToInsert);
+                            if (habitInsertError) {
+                                console.error("Error migrating habits:", habitInsertError);
+                            } else {
+                                dbHabits = habitsToInsert;
+                            }
                         }
 
                         if (dbLogs.length === 0 && legacyLogs.length > 0) {
@@ -303,9 +312,13 @@ const Page = () => {
                                 };
                             });
                             if (logsToInsert.length > 0) {
-                                await supabase.from('logs').insert(logsToInsert);
+                                var { error: logInsertError } = await supabase.from('logs').insert(logsToInsert);
+                                if (logInsertError) {
+                                    console.error("Error migrating logs:", logInsertError);
+                                } else {
+                                    dbLogs = logsToInsert;
+                                }
                             }
-                            dbLogs = logsToInsert;
                         }
 
                         if (dbFriendsIds.length === 0 && legacyFriends.length > 0) {
@@ -316,8 +329,12 @@ const Page = () => {
                                     friend_id: f.id
                                 };
                             });
-                            await supabase.from('friends').insert(friendsToInsert);
-                            dbFriendsIds = legacyFriends.map(function(f) { return f.id; });
+                            var { error: friendInsertError } = await supabase.from('friends').insert(friendsToInsert);
+                            if (friendInsertError) {
+                                console.error("Error migrating friends:", friendInsertError);
+                            } else {
+                                dbFriendsIds = legacyFriends.map(function(f) { return f.id; });
+                            }
                         }
 
                         // Load friends' full profiles dynamically based on their friend IDs
