@@ -713,40 +713,294 @@ const LoginScreen = (props) => {
         }
     }
 
+    const scrollToLogin = () => {
+        const input = document.getElementById('login-email-input');
+        if (input) {
+            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => input.focus(), 500);
+        }
+    };
+
+    // Generate a mini mock heatmap data array for visualization
+    const mockHeatmap = Array.from({ length: 28 }, (_, i) => {
+        // Create variations of green shades
+        if (i % 7 === 0) return 'bg-emerald-50';
+        if (i % 5 === 0) return 'bg-emerald-200';
+        if (i % 3 === 0) return 'bg-emerald-400';
+        if (i % 2 === 0) return 'bg-emerald-600';
+        return 'bg-emerald-500';
+    });
+
     return (
-        <div className="min-h-screen flex items-center justify-center p-8 bg-white">
-            <div className="w-full max-w-md space-y-12 fade-in text-center">
-                <div className="w-24 h-24 bg-emerald-50 rounded-[2.5rem] mx-auto flex items-center justify-center shadow-xl shadow-emerald-100">
-                    <img src="/logo.png" className="w-12 h-12 object-contain" alt="logo" onError={function(e){e.target.style.display='none';}} />
+        <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans">
+            {/* Top Navigation */}
+            <header className="glass-header sticky top-0 z-30 border-b border-slate-100/50 w-full">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center w-full">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center shadow-sm border border-emerald-100">
+                            <img src="/logo.png" className="w-6 h-6 object-contain" alt="logo" onError={function(e){e.target.style.display='none';}} />
+                        </div>
+                        <h1 className="text-xl font-extrabold text-slate-900 tracking-tighter logo-gradient">
+                            Habitify
+                        </h1>
+                    </div>
+                    <button 
+                        onClick={scrollToLogin}
+                        className="bg-emerald-50 hover:bg-emerald-100/80 text-emerald-700 px-4 py-2 rounded-xl text-xs font-bold transition-all"
+                    >
+                        Sign In
+                    </button>
                 </div>
-                <div className="space-y-2">
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tighter">Habitify</h2>
-                    <p className="text-sm text-slate-500 font-medium leading-relaxed">
-                        {step === 'email' 
-                            ? 'New or existing user? Enter your email ID below to sign up or log in with a secure one-time code.' 
-                            : 'Check your inbox for the secure verification code.'}
-                    </p>
+            </header>
+
+            {/* Main Hero & Content Section */}
+            <main className="max-w-7xl mx-auto px-6 w-full flex-grow py-12 space-y-24">
+                
+                {/* Hero Layout: Split column on desktop, stacked on mobile/tablet */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center min-h-[75vh]">
+                    
+                    {/* Left Column: Branding and App Preview (Mobile & Desktop friendly) */}
+                    <div className="lg:col-span-7 space-y-8 text-center lg:text-left fade-in">
+                        <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full text-emerald-800 text-xs font-bold tracking-wide uppercase">
+                            ✨ Elevate Your Daily Routine
+                        </div>
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 tracking-tight leading-none">
+                            Transform Your Habits, <br className="hidden sm:inline" />
+                            <span className="logo-gradient">Elevate Your Life</span>
+                        </h1>
+                        <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium">
+                            Visualize your progress, gain insights, and achieve your goals with our intuitive habit tracking platform. Join thousands of users optimizing their lives today.
+                        </p>
+                        
+                        <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                            <button 
+                                onClick={scrollToLogin}
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg shadow-emerald-100 flex items-center justify-center gap-2"
+                            >
+                                Start Your Journey 🚀
+                            </button>
+                            <a 
+                                href="#features-section"
+                                className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-4 rounded-2xl font-bold transition-all flex items-center justify-center"
+                            >
+                                Explore Features
+                            </a>
+                        </div>
+
+                        {/* Interactive mini heatmap widget simulation */}
+                        <div className="pt-6 hidden sm:block max-w-sm mx-auto lg:mx-0">
+                            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xl">🏃‍♂️</span>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-slate-800">Exercise Daily</h4>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Do Habit</p>
+                                        </div>
+                                    </div>
+                                    <span className="bg-emerald-50 text-emerald-700 text-xs font-black px-2 py-1 rounded-lg">🔥 24d Streak</span>
+                                </div>
+                                <div className="grid grid-cols-7 gap-1">
+                                    {mockHeatmap.map((className, idx) => (
+                                        <div 
+                                            key={idx} 
+                                            className={`w-full aspect-square rounded-md transition-all hover:scale-110 cursor-pointer ${className}`}
+                                            title={`Day ${idx + 1}: Done!`}
+                                        />
+                                    ))}
+                                </div>
+                                <div className="flex justify-between text-[9px] text-slate-400 font-bold uppercase">
+                                    <span>Mon</span>
+                                    <span>Visualize Your Progress</span>
+                                    <span>Sun</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Column: Secure Email OTP Form Card */}
+                    <div className="lg:col-span-5 flex justify-center w-full">
+                        <div className="w-full max-w-md bg-white border border-slate-100 p-8 sm:p-12 rounded-[2.5rem] shadow-xl shadow-slate-100/50 space-y-8 fade-in">
+                            <div className="w-20 h-20 bg-emerald-50 rounded-[2rem] mx-auto flex items-center justify-center shadow-lg shadow-emerald-100/50">
+                                <img src="/logo.png" className="w-10 h-10 object-contain" alt="logo" onError={function(e){e.target.style.display='none';}} />
+                            </div>
+                            <div className="space-y-2 text-center">
+                                <h2 className="text-2xl font-black text-slate-900 tracking-tighter">Welcome to Habitify</h2>
+                                <p className="text-xs text-slate-500 font-medium leading-relaxed max-w-xs mx-auto">
+                                    {step === 'email' 
+                                        ? 'Sign up or log in securely with a one-time verification code sent to your email.' 
+                                        : 'We sent a 6-digit secure code to your email. Enter it below to restore your habits.'}
+                                </p>
+                            </div>
+
+                            <div className="space-y-4">
+                                {step === 'email' ? (
+                                    <div className="space-y-4">
+                                        <input 
+                                            id="login-email-input"
+                                            value={email} 
+                                            onChange={e => setEmail(e.target.value)} 
+                                            type="email" 
+                                            placeholder="name@example.com" 
+                                            className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white rounded-2xl outline-none font-bold text-slate-800 text-center transition-all" 
+                                        />
+                                        <button 
+                                            disabled={loading} 
+                                            onClick={handleSendCode} 
+                                            className="w-full py-5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-emerald-100 transition-all active:scale-95 cursor-pointer"
+                                        >
+                                            {loading ? 'Sending Code...' : 'Get Login Code'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <input 
+                                            value={otp} 
+                                            onChange={e => setOtp(e.target.value)} 
+                                            type="text" 
+                                            placeholder="Enter Code" 
+                                            className="w-full p-5 bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white rounded-2xl outline-none font-black text-3xl text-slate-800 text-center tracking-[0.2em] transition-all" 
+                                        />
+                                        <button 
+                                            disabled={loading} 
+                                            onClick={handleVerify} 
+                                            className="w-full py-5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-emerald-100 transition-all active:scale-95 cursor-pointer"
+                                        >
+                                            {loading ? 'Verifying...' : 'Login & Restore'}
+                                        </button>
+                                        <button 
+                                            onClick={() => setStep('email')} 
+                                            className="w-full py-2 text-[10px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-all cursor-pointer"
+                                        >
+                                            Resend or Change Email
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="space-y-4">
-                    {step === 'email' ? (
-                        <div className="space-y-4">
-                            <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="name@example.com" className="w-full p-6 bg-slate-50 border-2 border-transparent focus:border-emerald-100 rounded-3xl outline-none font-bold text-slate-800 text-center" />
-                            <button disabled={loading} onClick={handleSendCode} className="w-full py-6 bg-emerald-600 text-white rounded-[2rem] font-black uppercase tracking-widest shadow-xl">
-                                {loading ? 'Sending Code...' : 'Get Login Code'}
-                            </button>
+                {/* Section: Features (Responsive layout grid) */}
+                <section id="features-section" className="space-y-12 pt-12">
+                    <div className="text-center max-w-3xl mx-auto space-y-4">
+                        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                            Designed to Help You Grow
+                        </h2>
+                        <p className="text-slate-500 font-medium">
+                            Take control of your daily routine with visual tools and deep insights designed to reinforce positive habits.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="bg-white border border-slate-100 hover:border-emerald-100 hover:shadow-lg p-8 rounded-3xl transition-all space-y-4 group">
+                            <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                                📊
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900">Visual Habit Tracking</h3>
+                            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                                See your progress at a glance with intuitive calendar heat maps. Instantly spot streaks and stay motivated day in and day out.
+                            </p>
                         </div>
-                    ) : (
-                        <div className="space-y-4">
-                            <input value={otp} onChange={e => setOtp(e.target.value)} type="text" placeholder="Enter Code" className="w-full p-6 bg-slate-50 border-2 border-transparent focus:border-emerald-100 rounded-3xl outline-none font-black text-3xl text-slate-800 text-center tracking-[0.2em]" />
-                            <button disabled={loading} onClick={handleVerify} className="w-full py-6 bg-emerald-600 text-white rounded-[2rem] font-black uppercase tracking-widest shadow-xl">
-                                {loading ? 'Verifying...' : 'Login & Restore'}
-                            </button>
-                            <button onClick={() => setStep('email')} className="w-full py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Resend or Change Email</button>
+
+                        <div className="bg-white border border-slate-100 hover:border-emerald-100 hover:shadow-lg p-8 rounded-3xl transition-all space-y-4 group">
+                            <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                                📈
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900">Insightful Analytics</h3>
+                            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                                Gain deep insights into your habits with customizable statistics and trends. Calculate your performance delta with precision.
+                            </p>
                         </div>
-                    )}
-                </div>
-            </div>
+
+                        <div className="bg-white border border-slate-100 hover:border-emerald-100 hover:shadow-lg p-8 rounded-3xl transition-all space-y-4 group">
+                            <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                                📓
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900">Daily Journaling</h3>
+                            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                                Reflect on your habits with built-in journaling. Keep notes on your progress, blockages, or daily milestones.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Section: Why Choose Us (Responsive layout grid) */}
+                <section className="space-y-12">
+                    <div className="text-center max-w-3xl mx-auto space-y-4">
+                        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                            Why Choose Our Habit Tracker?
+                        </h2>
+                        <p className="text-slate-500 font-medium">
+                            A powerful habit companion built with modern UI standards and dynamic integrations.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="flex gap-4 items-start bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
+                            <span className="text-2xl mt-1">✨</span>
+                            <div className="space-y-1">
+                                <h4 className="font-bold text-slate-900">Intuitive Interface</h4>
+                                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                                    Easy-to-use design that makes habit tracking a seamless part of your day, with no complex setup.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4 items-start bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
+                            <span className="text-2xl mt-1">🎨</span>
+                            <div className="space-y-1">
+                                <h4 className="font-bold text-slate-900">Fully Customizable</h4>
+                                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                                    Tailor your habit targets, schedules, and sharing configurations to fit your unique lifestyle and goals.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4 items-start bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
+                            <span className="text-2xl mt-1">🧠</span>
+                            <div className="space-y-1">
+                                <h4 className="font-bold text-slate-900">Data-Driven Insights</h4>
+                                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                                    Unlock valuable insights into your habits and behaviors with status indicators (Ahead, Safe, Safe, Lagging).
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4 items-start bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
+                            <span className="text-2xl mt-1">🌐</span>
+                            <div className="space-y-1">
+                                <h4 className="font-bold text-slate-900">Cross-Platform Access</h4>
+                                <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                                    Install Habitify as a Progressive Web App (PWA) to track habits on mobile, tablet, and desktop with zero friction.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Section: Bottom CTA */}
+                <section className="bg-slate-900 text-white rounded-[2.5rem] p-12 text-center space-y-6 relative overflow-hidden shadow-xl">
+                    <div className="absolute inset-0 bg-gradient-mesh opacity-10 pointer-events-none" />
+                    <h2 className="text-3xl font-extrabold tracking-tight">Ready to Transform Your Life?</h2>
+                    <p className="text-slate-400 font-medium max-w-xl mx-auto text-sm leading-relaxed">
+                        Join thousands of users who have already improved their lives and build lasting routines with our powerful habit tracking tools.
+                    </p>
+                    <div>
+                        <button 
+                            onClick={scrollToLogin}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg active:scale-95 cursor-pointer"
+                        >
+                            Get Started Now
+                        </button>
+                    </div>
+                </section>
+            </main>
+
+            {/* Footer */}
+            <footer className="border-t border-slate-100 bg-white/80 py-8 w-full mt-12 text-center text-xs text-slate-400 font-bold uppercase tracking-wider">
+                © {new Date().getFullYear()} Habitify. Built with passion.
+            </footer>
         </div>
     );
 };
